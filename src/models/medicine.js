@@ -1,50 +1,33 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
-const MedicineType = require("./medicineType");
+const mongoose = require("mongoose");
 
-const Medicine = sequelize.define("Medicine", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
+const medicineSchema = new mongoose.Schema({
   medicine_code: {
-    type: DataTypes.STRING(10),
-    allowNull: false,
+    type: String,
+    required: true,
     unique: true,
   },
   medicine_name: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
+    type: String,
+    required: true,
   },
   medicine_type_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: MedicineType,
-      key: "id",
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MedicineType",
+    required: true,
   },
   price: {
-    type: DataTypes.INTEGER, // Giá tính bằng VNĐ, dùng INTEGER để tránh lỗi thập phân
-    allowNull: false,
+    type: Number,
+    required: true,
   },
   unit: {
-    type: DataTypes.STRING(20), // Đơn vị tính: viên, lọ, ống, ...
-    allowNull: false,
+    type: String,
+    required: true,
   },
   description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
+    type: String,
   },
 }, {
   timestamps: true,
-  createdAt: "createdAt",
-  updatedAt: "updatedAt",
 });
 
-// Thiết lập quan hệ
-MedicineType.hasMany(Medicine, { foreignKey: "medicine_type_id" });
-Medicine.belongsTo(MedicineType, { foreignKey: "medicine_type_id" });
-
-module.exports = Medicine;
+module.exports = mongoose.model("Medicine", medicineSchema);

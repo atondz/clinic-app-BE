@@ -1,24 +1,18 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');
+// models/Clinic.js
+const mongoose = require("mongoose");
 
-const Clinic = sequelize.define('Clinic', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
+const clinicSchema = new mongoose.Schema({
   code: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: String,
+    required: true,
     unique: true,
   },
   name: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: String,
+    required: true,
   },
 }, {
-  tableName: 'clinics',
-  timestamps: false,
+  timestamps: true // tương đương createdAt, updatedAt
 });
 
-module.exports = Clinic;
+module.exports = mongoose.model("Clinic", clinicSchema);

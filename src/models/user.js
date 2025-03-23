@@ -1,33 +1,27 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../config/db');
+const mongoose = require("mongoose");
 
-const User = sequelize.define('User', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    email: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: false,
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    role: {
-        type: DataTypes.ENUM('admin', 'doctor', 'staff'),
-        allowNull: false,
-    },
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    match: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ["admin", "doctor", "staff"],
+    required: true,
+  },
 }, {
-    timestamps: true,  // Bật timestamps để Sequelize tự động tạo createdAt và updatedAt
-    createdAt: 'created_at',  // Chỉ định tên cột trong DB là 'created_at'
-    updatedAt: 'updated_at',  // Chỉ định tên cột trong DB là 'updated_at'
+  timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
 });
 
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);

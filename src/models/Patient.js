@@ -1,50 +1,38 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
+const mongoose = require("mongoose");
 
-const Patient = sequelize.define("Patient", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
+const patientSchema = new mongoose.Schema({
   id_card: {
-    type: DataTypes.STRING(12),
-    allowNull: false,
+    type: String,
+    required: true,
     unique: true,
   },
   patient_id: {
-    type: DataTypes.STRING(10),
-    allowNull: false,
+    type: String,
+    required: true,
     unique: true,
   },
   name: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
+    type: String,
+    required: true,
   },
   gender: {
-    type: DataTypes.BOOLEAN, // true = Nam, false = Nữ
-    allowNull: false,
+    type: Boolean, // true = Nam, false = Nữ
+    required: true,
   },
   birth_date: {
-    type: DataTypes.DATEONLY,
-    allowNull: false,
+    type: Date,
+    required: true,
   },
   phone: {
-    type: DataTypes.STRING(15),
-    allowNull: false,
+    type: String,
+    required: true,
     unique: true,
   },
   address: {
-    type: DataTypes.STRING(255),
-    allowNull: true,
+    type: String,
   },
-},
-{
-  timestamps: true,  // Bật timestamps để Sequelize tự động tạo createdAt và updatedAt
-  createdAt: 'createdAt',  // Chỉ định tên cột trong DB là 'createdAt'
-  updatedAt: 'updatedAt',  // Chỉ định tên cột trong DB là 'updatedAt'
-}
+}, {
+  timestamps: true,
+});
 
-);
-
-module.exports = Patient;
+module.exports = mongoose.model("Patient", patientSchema);

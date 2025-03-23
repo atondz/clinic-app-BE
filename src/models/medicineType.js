@@ -1,25 +1,17 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
+const mongoose = require("mongoose");
 
-const MedicineType = sequelize.define("MedicineType", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
+const medicineTypeSchema = new mongoose.Schema({
   medicine_type_code: {
-    type: DataTypes.STRING(10),
-    allowNull: false,
+    type: String,
+    required: true,
     unique: true,
   },
   medicine_type_name: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
+    type: String,
+    required: true,
   },
 }, {
-  timestamps: true, // Tự động thêm createdAt và updatedAt
-  createdAt: "createdAt",
-  updatedAt: "updatedAt",
+  timestamps: true,
 });
 
-module.exports = MedicineType;
+module.exports = mongoose.model("MedicineType", medicineTypeSchema);

@@ -2,49 +2,40 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Register a new user
+// Đăng ký
 exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    
-    // Check if all required fields are provided
+
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: "All fields are required" });
     }
-   
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
 
-    // Check if the email is already registered in the system
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email is already in use" });
-    }
-
-    // Validate the role against a predefined list of allowed roles
     const validRoles = ["admin", "doctor", "staff"];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid role" });
     }
 
-    // Hash the password before storing it in the database for security purposes
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email is already in use" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user record in the database
-    const user = await User.create({
+    const user = new User({
       name,
       email,
       password: hashedPassword,
       role,
     });
 
-    // Return the newly created user’s information (excluding password)
+    await user.save();
+
     res.status(201).json({
       message: "User created successfully",
       user: {
-        id: user.id,
+        id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -53,7 +44,6 @@ exports.register = async (req, res) => {
       },
     });
   } catch (error) {
-    // Handle unexpected server errors and return an error response
     res.status(500).json({
       message: "Error creating user",
       error: error.message || error,
@@ -61,34 +51,55 @@ exports.register = async (req, res) => {
   }
 };
 
-// Authenticate and log in a user
+// Đăng nhập
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find the user in the database based on the provided email
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Compare the provided password with the stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    // Generate a JWT token containing the user's ID and role with a 1-hour expiration
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // Return the generated authentication token
     res.json({ token });
   } catch (error) {
-    // Handle unexpected server errors during login
-    res.status(500).json({ message: "Error logging in", error });
+    res.status(500).json({ message: "Error logging in", error: error.message });
+  }
+};
+
+// Lấy tất cả người dùng
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users", error: error.message });
+  }
+};
+
+// Lấy người dùng theo tên
+exports.getUserByName = async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    const user = await User.findOne({ name }).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user", error: error.message });
   }
 };
