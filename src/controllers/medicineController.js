@@ -1,5 +1,5 @@
-const Medicine = require("../models/Medicine");
-const MedicineType = require("../models/MedicineType");
+const Medicine = require("../models/medicine");
+const MedicineType = require("../models/medicineType");
 
 // Thêm thuốc
 const createMedicine = async (req, res) => {
