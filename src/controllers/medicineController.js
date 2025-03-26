@@ -6,8 +6,24 @@ const createMedicine = async (req, res) => {
   try {
     const { medicine_code, medicine_name, medicine_type_id, price, unit, description } = req.body;
 
-    if (!medicine_code || !medicine_name || !medicine_type_id || !price || !unit) {
-      return res.status(400).json({ message: "Vui lòng cung cấp đầy đủ thông tin bắt buộc" });
+    // Danh sách các trường bắt buộc
+    const requiredFields = ['medicine_code', 'medicine_name', 'medicine_type_id', 'price', 'unit'];
+    let missingFields = [];
+
+    // Kiểm tra từng trường và thêm vào mảng missingFields nếu thiếu
+    if (!medicine_code) missingFields.push('medicine_code');
+    if (!medicine_name) missingFields.push('medicine_name');
+    if (!medicine_type_id) missingFields.push('medicine_type_id');
+    if (!price) missingFields.push('price');
+    if (!unit) missingFields.push('unit');
+
+    // Nếu có trường bị thiếu, ghi log và trả về lỗi
+    if (missingFields.length > 0) {
+      console.log("Missing field(s):", missingFields.join(", "));
+      return res.status(400).json({
+        message: "Vui lòng cung cấp đầy đủ thông tin bắt buộc, ID-Type",
+        missingFields: missingFields
+      });
     }
 
     const medicineType = await MedicineType.findById(medicine_type_id);

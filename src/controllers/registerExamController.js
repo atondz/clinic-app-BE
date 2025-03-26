@@ -2,8 +2,6 @@
 
 const Patient = require("../models/Patient");
 const Registration = require("../models/Registration");
-const Clinic = require("../models/Clinic");
-const User = require("../models/user");
 
 // Hàm sinh mã khám 8 số
 const generateMedicalCode = async () => {
@@ -36,17 +34,30 @@ exports.createRegistration = async (req, res) => {
     let patientId;
 
     if (isNewPatient) {
+      // Kiểm tra xem ID_card đã tồn tại chưa
+      const existingPatient = await Patient.findOne({ id_card: patientData.id_card });
+      if (existingPatient) {
+        return res.status(400).json({
+          message: "Bệnh nhân với ID_card này đã tồn tại. Vui lòng sử dụng bệnh nhân hiện có.",
+          patientId: existingPatient._id,
+        });
+      }
+
       const lastPatient = await Patient.findOne().sort({ createdAt: -1 });
       const newIdNum = lastPatient
         ? parseInt(lastPatient.patient_id.replace("PAT", "")) + 1
         : 1;
       const patient_id = `PAT${String(newIdNum).padStart(4, "0")}`;
 
+      // Không cần chuyển đổi gender nữa vì model đã chấp nhận chuỗi
       const newPatient = new Patient({ ...patientData, patient_id });
       const savedPatient = await newPatient.save();
       patientId = savedPatient._id;
     } else {
       patientId = selectedPatientId;
+      if (!patientId) {
+        return res.status(400).json({ message: "Vui lòng cung cấp patient_id cho bệnh nhân hiện có." });
+      }
     }
 
     const medical_code = await generateMedicalCode();
@@ -75,11 +86,17 @@ exports.createRegistration = async (req, res) => {
     res.status(201).json({ message: "Đăng ký khám thành công" });
   } catch (error) {
     console.error("Đăng ký khám thất bại:", error);
-    res.status(500).json({ message: "Lỗi server", error: error.message });
+    if (error.code === 11000) { // Lỗi trùng lặp từ MongoDB
+      res.status(400).json({ message: "Bệnh nhân với ID_card hoặc số điện thoại này đã tồn tại." });
+    } else if (error.name === "ValidationError") {
+      res.status(400).json({ message: "Dữ liệu không hợp lệ", errors: error.errors });
+    } else {
+      res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
   }
 };
 
-// Lấy tất cả đăng ký
+// Các hàm khác giữ nguyên
 exports.getAllRegistrations = async (req, res) => {
   try {
     const registrations = await Registration.find()
@@ -92,7 +109,6 @@ exports.getAllRegistrations = async (req, res) => {
   }
 };
 
-// Tìm theo căn cước công dân (CCCD)
 exports.findByIdCard = async (req, res) => {
   try {
     const { id_card } = req.params;
@@ -108,7 +124,6 @@ exports.findByIdCard = async (req, res) => {
   }
 };
 
-// Tìm theo tên bệnh nhân
 exports.findByPatientName = async (req, res) => {
   try {
     const { name } = req.params;
@@ -124,7 +139,6 @@ exports.findByPatientName = async (req, res) => {
   }
 };
 
-// Cập nhật đăng ký khám
 exports.updateRegistration = async (req, res) => {
   try {
     const { id } = req.params;
@@ -135,7 +149,6 @@ exports.updateRegistration = async (req, res) => {
   }
 };
 
-// Xoá đăng ký khám
 exports.deleteRegistration = async (req, res) => {
   try {
     const { id } = req.params;

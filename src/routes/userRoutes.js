@@ -7,9 +7,12 @@ const { verifyToken } = require("../middlewares/authMiddleware");
 router.post("/register", userController.register);
 router.post("/login", userController.login);
 // Lấy tất cả người dùng (phải đăng nhập)
-router.get("/users", verifyToken, userController.getAllUsers);
+router.get("/users", userController.getAllUsers);
 
 // Lấy người dùng theo tên (phải đăng nhập)
-router.get("/users/name/:name", verifyToken, userController.getUserByName);
+router.get("/users/name/:name", userController.getUserByName);
+
+router.get("/doctors", userController.getDoctors);
 
 module.exports = router;
+    

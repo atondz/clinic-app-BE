@@ -6,7 +6,7 @@ const patientRoutes = require("./routes/patientRoutes");
 const medicineTypeRoutes = require("./routes/medicineTypeRoutes");
 const medicineRoutes = require("./routes/medicineRoutes");
 const clinicRoutes = require('./routes/clinicRoutes');
-const isStaff = require('./middlewares/isStaff');
+// const isStaff = require('./middlewares/isStaff');
 const registerExamRoutes = require('./routes/registerExamRoutes');
 const app = express();
 

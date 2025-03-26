@@ -20,7 +20,8 @@ const userSchema = new mongoose.Schema({
     enum: ["admin", "doctor", "staff"],
     required: true,
   },
-}, {
+},
+{
   timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
 });
 

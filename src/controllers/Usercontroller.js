@@ -103,3 +103,15 @@ exports.getUserByName = async (req, res) => {
     res.status(500).json({ message: "Error fetching user", error: error.message });
   }
 };
+// controllers/userController.js
+
+
+// Lấy danh sách bác sĩ
+exports.getDoctors = async (req, res) => {
+  try {
+    const doctors = await User.find({ role: 'doctor' }).select('name _id'); // Chỉ cần tên và id
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
