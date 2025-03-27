@@ -10,7 +10,7 @@ router.get('/registrations', authenticateToken, doctorOnly, doctorController.get
 router.post('/prescriptions', authenticateToken, doctorOnly, doctorController.createPrescription);
 
 // Lấy danh sách phiếu khám của bác sĩ dựa trên doctor_id
-router.get('/registrations/:doctor_id', authenticateToken, doctorOnly, doctorController.getRegistrationsByDoctor);
+router.get('/registrations/:id', authenticateToken, doctorOnly, doctorController.getRegistrationsByDoctor);
 
 
 module.exports = router;

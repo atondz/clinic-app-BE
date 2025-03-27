@@ -141,7 +141,11 @@ exports.getMe = async (req, res) => {
 
     if (!user) return res.status(404).json({ msg: 'User not found' });
 
-    res.json(user);
+    res.json({
+      ...user.toObject(),
+      role: user.role
+    });
+
   } catch (error) {
     res.status(500).json({ msg: 'Server error' });
   }
