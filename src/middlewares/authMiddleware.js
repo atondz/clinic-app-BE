@@ -1,19 +1,26 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-exports.verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+module.exports = {
+  // Middleware kiểm tra token và xác thực
+  authenticateToken: (req, res, next) => {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized: No token provided" });
-  }
+    if (!token) return res.status(401).json({ msg: 'Unauthorized' });
 
-  const token = authHeader.split(" ")[1];
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded; // Lưu thông tin user vào request để sử dụng ở endpoint sau
+      next();
+    } catch (error) {
+      res.status(401).json({ msg: 'Token is invalid' });
+    }
+  },
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // lưu thông tin user vào req để dùng tiếp
+  // Middleware kiểm tra vai trò là bác sĩ
+  doctorOnly: (req, res, next) => {
+    if (req.user.role !== 'doctor') {
+      return res.status(403).json({ message: 'Access forbidden: requires doctor role' });
+    }
     next();
-  } catch (error) {
-    res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
 };

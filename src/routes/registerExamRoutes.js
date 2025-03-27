@@ -3,7 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const registerExamController = require("../controllers/registerExamController");
-const isStaff = require("../middlewares/isStaff");
+const { authenticateToken, doctorOnly } = require('../middlewares/authMiddleware'); // Import middleware
 
 // Tạo đăng ký khám
 router.post("/", registerExamController.createRegistration);
@@ -22,5 +22,9 @@ router.put("/:id", registerExamController.updateRegistration);
 
 // Xoá đăng ký khám
 router.delete("/:id", registerExamController.deleteRegistration);
+
+router.get('/doctor/:doctor_id', registerExamController.getRegistrationsByDoctor);
+
+router.post('/prescriptions', registerExamController.createPrescription);
 
 module.exports = router;

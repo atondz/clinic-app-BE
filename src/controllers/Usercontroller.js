@@ -115,3 +115,34 @@ exports.getDoctors = async (req, res) => {
     res.status(500).json({ message: 'Lỗi server', error: error.message });
   }
 };
+// Lấy người dùng theo ID
+exports.getUserById = async (req, res) => {
+  try {
+    const { id } = req.params; // Lấy ID từ tham số trong URL
+
+    // Tìm người dùng theo ID và loại bỏ mật khẩu
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user); // Trả về thông tin người dùng
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user", error: error.message });
+  }
+};
+// ví dụ endpoint
+
+
+exports.getMe = async (req, res) => {
+  try {
+    const userId = req.user.id; // lấy từ middleware
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+};

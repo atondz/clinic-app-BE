@@ -158,3 +158,29 @@ exports.deleteRegistration = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
+
+exports.getRegistrationsByDoctor = async (req, res) => {
+  try {
+    const doctor_id = req.params.doctor_id;
+    const registrations = await Registration.find({ doctor_id }).populate('patient_id');
+    res.status(200).json(registrations);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+exports.createPrescription = async (req, res) => {
+  try {
+    const { patient_id, registration_id, doctor_id, medicines, notes } = req.body;
+    const newPrescription = new Prescription({
+      patient_id,
+      registration_id,
+      doctor_id,
+      medicines,
+      notes
+    });
+    await newPrescription.save();
+    res.status(201).json({ message: 'Tạo đơn thuốc thành công' });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};

@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["admin", "doctor", "staff"],
-    required: true,
+    default: "staff",  // Thêm giá trị mặc định
+    required: false,    // Không bắt buộc nhập
   },
 },
 {
