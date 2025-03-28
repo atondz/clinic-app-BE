@@ -7,7 +7,7 @@ const medicineRoutes = require("./routes/medicineRoutes");
 const clinicRoutes = require('./routes/clinicRoutes');
 const registerExamRoutes = require('./routes/registerExamRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
-
+const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const app = express();
 
 app.use(cors());
@@ -18,6 +18,6 @@ app.use("/api/medicineTypes", medicineTypeRoutes);
 app.use("/api/medicine", medicineRoutes);
 app.use('/api/clinics', clinicRoutes);
 app.use('/api/registerExam', registerExamRoutes);
-app.use("/api/doctor", doctorRoutes);  // Đảm bảo import đúng route của bác sĩ
-
+app.use("/api/doctor", doctorRoutes); 
+app.use('/api/prescriptions', prescriptionRoutes);
 module.exports = app;
