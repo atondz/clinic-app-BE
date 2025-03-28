@@ -12,6 +12,7 @@ const patientSchema = new mongoose.Schema({
   birth_date: { type: Date, required: true },
   phone: { type: String, required: true, unique: true },
   address: { type: String, required: true },
+  medical_history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Diagnosis' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Patient", patientSchema);

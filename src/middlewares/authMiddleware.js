@@ -3,19 +3,29 @@ const jwt = require('jsonwebtoken');
 module.exports = {
   // Middleware kiểm tra token và xác thực
   authenticateToken: (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-    if (!token) return res.status(401).json({ msg: 'Unauthorized' });
-
+    const authHeader = req.header('Authorization');
+    console.log('Authorization Header:', authHeader);
+  
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ msg: 'Unauthorized - No Bearer token provided' });
+    }
+  
+    const token = authHeader.replace('Bearer ', '');
+    console.log('Token:', token);
+  
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded; // Lưu thông tin user vào request để sử dụng ở endpoint sau
+      console.log('Decoded Token:', decoded);
+      req.user = decoded; // Gán decoded trực tiếp
+      if (!req.user.id) { // Sửa từ _id thành id
+        return res.status(401).json({ msg: 'Token does not contain user ID' });
+      }
       next();
     } catch (error) {
-      res.status(401).json({ msg: 'Token is invalid' });
+      console.error('JWT Verify Error:', error.message);
+      return res.status(401).json({ msg: 'Token is invalid' });
     }
   },
-
   // Middleware kiểm tra vai trò là bác sĩ
   doctorOnly: (req, res, next) => {
     if (req.user.role !== 'doctor') {

@@ -8,6 +8,7 @@ const clinicRoutes = require('./routes/clinicRoutes');
 const registerExamRoutes = require('./routes/registerExamRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
+const diagnosisRoutes = require("./routes/diagnosisRoutes");
 const app = express();
 
 app.use(cors());
@@ -20,4 +21,5 @@ app.use('/api/clinics', clinicRoutes);
 app.use('/api/registerExam', registerExamRoutes);
 app.use("/api/doctor", doctorRoutes); 
 app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/diagnosis', diagnosisRoutes);
 module.exports = app;
