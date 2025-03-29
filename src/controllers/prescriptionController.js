@@ -1,6 +1,7 @@
 const Prescription = require('../models/Prescription');
 const Patient = require('../models/Patient');
 const Medicine = require('../models/medicine');
+const CONSTANT = require('../config/constant')
 
 // Tạo đơn thuốc (đã có)
 exports.createPrescription = async (req, res) => {
@@ -37,7 +38,8 @@ exports.createPrescription = async (req, res) => {
       registration_id,
       doctor_id,
       medicines: updatedMedicines,
-      notes
+      notes,
+      status: CONSTANT.PAYMENT_STATUS.WAITING
     });
 
     await newPrescription.save();
@@ -57,7 +59,7 @@ exports.getAllPrescriptions = async (req, res) => {
       .populate({
         path: 'medicines.medicine_id',
         select: 'medicine_name price' // Lấy tên và giá thuốc
-      });
+      }).sort({ date_created: -1 });;
     res.status(200).json(prescriptions);
   } catch (error) {
     console.error('Lỗi lấy danh sách đơn thuốc:', error);
@@ -137,6 +139,38 @@ exports.updatePrescription = async (req, res) => {
   }
 };
 
+exports.charged = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const prescription = await Prescription.findById(id);
+
+    if (!prescription) return res.status(404).json({ message: "Không tìm thấy đơn thuốc" });
+
+    prescription.status = CONSTANT.PAYMENT_STATUS.CHARGED;
+
+    await prescription.save();
+    res.json(prescription);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi tìm kiếm bệnh nhân", error: error.message });
+  }
+};
+
+exports.cancel = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("id", id)
+    const prescription = await Prescription.findById(id);
+
+    if (!prescription) return res.status(404).json({ message: "Không tìm thấy đơn thuốc" });
+
+    prescription.status = CONSTANT.PAYMENT_STATUS.CANCEL;
+
+    await prescription.save();
+    res.json(prescription);
+  } catch (error) {
+    res.status(500).json({ message: "Không tìm thấy đơn thuốc", error: error.message });
+  }
+};
 // Xóa đơn thuốc theo ID
 exports.deletePrescription = async (req, res) => {
   try {

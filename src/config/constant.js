@@ -1,0 +1,6 @@
+exports.PAYMENT_STATUS = {
+    WAITING: "WAITING",
+    CHARGED: "CHARGED",
+    CANCEL: "CANCEL"
+}
+

@@ -17,7 +17,8 @@ const prescriptionSchema = new mongoose.Schema({
   ],
   notes: { type: String },
   total_price: { type: Number, default: 0 },
-  date_created: { type: Date, default: Date.now }
+  date_created: { type: Date, default: Date.now },
+  status: { type: String },
 });
 
 prescriptionSchema.pre('save', function(next) {

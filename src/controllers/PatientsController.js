@@ -47,6 +47,7 @@ exports.getPatientByIdCard = async (req, res) => {
   }
 };
 
+
 // 3️⃣ Lấy danh sách bệnh nhân
 exports.getAllPatients = async (req, res) => {
   try {
